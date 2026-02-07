@@ -11,7 +11,7 @@ class MultiHeadAttention(nn.Module):
     que el modelo atienda a diferentes representaciones en paralelo.
     """
 
-    def _init_(self, d_model: int = 256, num_heads: int = 8) -> None:
+    def __init__(self, d_model: int = 256, num_heads: int = 8) -> None:
         """Inicializa la capa de atención.
 
         Args:

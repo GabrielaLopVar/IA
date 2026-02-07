@@ -1,83 +1,48 @@
-# ***BPE Tokenizer para Textos Híbridos: Literarios y Técnicos***
+# *** PANADERIA.GPT: El Cerebro de CachitoGPT***
 
-## ***Código:***
+Este proyecto representa la creación de una Inteligencia Artificial artesanal, diseñada para aprender y conversar sobre el mundo de la panadería utilizando una arquitectura de vanguardia.
 
-```python
-from tokenizers import Tokenizer, models, trainers
-
-tokenizer = Tokenizer(models.BPE())
-
-with open("El arte de ser nosotros.txt", "r", encoding="utf-8") as f:
-    contenido_archivo = f.read()
-
-textos = [
-    contenido_archivo,
-    "BET cmolc (10^6/8)",
-    "C(105) 10KHz/MHz 1Mx: DCT",
-    "Self size: 1Mx: DCT",
-    "Self mark: DCT"
-]
-
-trainer = trainers.BpeTrainer(
-    vocab_size=1000,
-    special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"]
-)
-
-tokenizer.train_from_iterator(textos, trainer)
-
-texto_prueba = "BET cmolc (10^6/8)"
-encoding = tokenizer.encode(texto_prueba)
-
-
-print("Tokens:", encoding.tokens)
-print("IDs:", encoding.ids)
-print("Decodificado:", tokenizer.decode(encoding.ids))
-```
-
-## _¿Cómo funciona?_
-
-_Este código implementa un tokenizador BPE, dónde:_
-
-- ###  _Importación e inicialización_
-
-_Primero se importan los componentes esenciales de la biblioteca tokenizers: Tokenizer para crear el tokenizador, models para elegir el algoritmo de tokenización (BPE en este caso), y trainers para configurar el entrenamiento. Luego se instancia un tokenizador específicamente con el modelo BPE (Byte Pair Encoding), que es un algoritmo que aprende subpalabras fusionando progresivamente los caracteres más frecuentes del texto._
+## ***Código Principal del Chat (`chat.py`):***
 
 ```python
-from tokenizers import Tokenizer, models, trainers
-tokenizer = Tokenizer(models.BPE())  
-```
+# Cargamos el cerebro (modelo) y el traductor (tokenizador)
+tokenizer.load("exports/vocabulario.json")
+model.load_state_dict(torch.load("exports/cachito_model.pth", weights_only=True))
 
-- ### _Preparación de datos_
+# El bucle donde ocurre la magia de la generación
+while True:
+    usuario = input("\nUSUARIO > ")
+    contexto = torch.tensor([tokenizer.encode(usuario)])
+    
+    # La IA predice la siguiente palabra una por una hasta completar la idea
+    for i in range(80):
+        logits, _ = model(contexto)
+        proximo_token = torch.argmax(logits[:, -1, :])
+        palabra = tokenizer.decode([proximo_token])
+        
+        if palabra is None or palabra == "<PAD>": break
+        print(palabra, end=" ", flush=True)
 
-_El código carga primero un archivo de texto llamado "El arte de ser nosotros.txt" en formato UTF-8. Este contenido se almacena en una variable y luego se combina con otros textos de ejemplo en una lista llamada textos. Estos textos adicionales parecen contener términos técnicos, fórmulas o códigos específicos. Al incluir ambos tipos de contenido, se asegura que el tokenizador aprenda tanto lenguaje natural como vocabulario técnico._
+¿Cómo funciona? (Explicación Humana)
+Construir esta IA fue como armar un rompecabezas tecnológico. Aquí te explicamos los pilares de lo que hicimos:
 
-```python
-with open("El arte de ser nosotros.txt", "r", encoding="utf-8") as f:
-    contenido_archivo = f.read()
+ Le dimos un "Cerebro" (Arquitectura Transformer)
+No usamos una simple base de datos de "pregunta y respuesta". Implementamos una estructura llamada Transformer, la misma tecnología que utiliza ChatGPT. Este cerebro no busca respuestas escritas, sino que calcula probabilidades. Cuando le preguntas por un "pan", el modelo activa sus conexiones neuronales para entender si te refieres a una receta, un ingrediente o un proceso de horneado.
 
-textos = [
-    contenido_archivo,
-    "BET cmolc (10^6/8)",
-    "C(105) 10KHz/MHz 1Mx: DCT",
-    "Self size: 1Mx: DCT",
-    "Self mark: DCT"
-```
+ Le enseñamos un idioma (Tokenización de Palabras)
+Las computadoras no entienden letras, solo números. Creamos un Motor de Texto que actúa como un traductor. Este motor tomó tu archivo datos.txt y creó un diccionario único donde cada palabra de tu panadería (como "masa", "leña" o "fermentado") tiene un número de identidad. Así, cuando tú escribes, la IA "lee" números y nos traduce la respuesta de vuelta a palabras humanas.
 
-- ### _Configuración del entrenamiento_
+ La pusimos a estudiar (Entrenamiento y Pérdida)
+En el archivo train.py, sometimos al modelo a un examen intenso. La IA leyó tus recetas una y otra vez, intentando adivinar cuál era la siguiente palabra. Al principio fallaba mucho (tenía un "Loss" o error alto de 5.4), pero tras varias vueltas, el error bajó a menos de 1.0, lo que significa que empezó a formar frases coherentes sobre tus productos.
 
-_Se crea un objeto BpeTrainer con parámetros clave: vocab_size=1000 lo que limita el vocabulario a mil tokens, obligando al algoritmo a aprender las subpalabras más útiles y frecuentes. Los special_tokens son símbolos reservados para funciones específicas: [UNK] representa palabras desconocidas, [CLS] y [SEP] para tareas de clasificación y separación, [PAD] para igualar longitudes, y [MASK] para entrenamiento con enmascaramiento._
+La hicimos "Resistente" (Blindaje de Código)
+Uno de los mayores retos fue cuando la IA se "confundía" y lanzaba errores técnicos (TypeError). Corregimos el código para que, si la IA encuentra una palabra extraña o se queda sin ideas, no se cierre el programa. Implementamos validaciones que le dicen: "Si no sabes qué decir, detente con elegancia", permitiendo que el chat sea fluido y profesional.
 
-```python
-trainer = trainers.BpeTrainer(
-    vocab_size=1000,  # Tamaño máximo del vocabulario
-    special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"]  # Tokens especiales
-)
-```
+Guía de Uso Rápido
+Alimentación: Guarda toda la información de tu panadería en data/datos.txt.
 
-- ### _Entrenamiento del tokenizador_
- 
-_Finalmente, se entrena el tokenizador llamando a train_from_iterator con la lista de textos y el trainer configurado. El algoritmo BPE analiza estadísticamente todo el corpus, identifica los pares de caracteres o subpalabras más frecuentes, y los fusiona iterativamente. Repite este proceso hasta alcanzar el tamaño de vocabulario especificado, creando un conjunto óptimo de tokens que balancea eficiencia y cobertura léxica para los textos proporcionados._
+Aprendizaje: Ejecuta python train.py para que la IA estudie tus textos.
 
-```python
- tokenizer.train_from_iterator(textos, trainer)
-```
+Conversación: Ejecuta python chat.py para entrar al sistema PANADERIA.GPT y empezar a chatear.
+
+“CachitoGPT no solo repite palabras, entiende el arte de hornear a través de datos.”

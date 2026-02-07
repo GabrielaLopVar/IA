@@ -1,0 +1,25 @@
+# Entorno Virtual
+venv/
+.env
+env/
+ENV/
+
+# Python basura
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Datos y Pesos (Para no saturar Git)
+sdatos.txt
+texto_entrenamiento.txt
+
+# Resultados del entrenamiento
+exports/
+*.pth
+*.json
+
+# VS Code / IDEs
+.vscode/
+.idea/
+.DS_Store
